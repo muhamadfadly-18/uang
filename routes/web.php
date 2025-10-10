@@ -19,6 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
@@ -74,39 +75,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/pengeluaranday/{id}', [PengeluaranController::class, 'update'])->name('pengeluaranday.update');
         Route::delete('/pengeluaranday/{id}', [PengeluaranController::class, 'destroy'])->name('pengeluaranday.destroy');
 
-
         Route::get('/history-saya', [HistoryController::class, 'userHistory'])->name('history.user');
     });
 });
-
-
-// ✅ ini versi image-laravel, bukan yang lama
-
-Route::get('/test-image', function () {
-    // Buat image kosong 300x200 dengan background hijau
-    $image = Image::create(300, 200)
-        ->fill('#4CAF50');
-
-    // Tambahkan teks di tengah
-    $image->text('Hello Fadly!', 150, 100, function ($font) {
-        // optional: font custom
-        // $font->filename(public_path('fonts/arial.ttf'));
-        $font->size(24);
-        $font->color('#ffffff');
-        $font->align('center');
-        $font->valign('middle');
-    });
-
-    // Simpan ke public
-    $path = public_path('test-image.png');
-    $image->save($path);
-
-    return '✅ Gambar berhasil dibuat di: <code>' . $path . '</code>';
-});
-
-
-Route::get('/scan-struk', function() {
-    return view('pengeluaran.scan'); // nanti kita buat view form upload
-});
-
-Route::post('/scan-struk', [PengeluaranController::class, 'scan'])->name('pengeluaran.scan');
