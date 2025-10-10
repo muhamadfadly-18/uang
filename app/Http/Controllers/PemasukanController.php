@@ -8,51 +8,68 @@ use Illuminate\Support\Facades\Auth;
 
 class PemasukanController extends Controller
 {
+    /**
+     * 🔹 ADMIN — Lihat semua data pemasukan
+     */
     public function index()
     {
-        $data = Pemasukan::latest()->get(); // ambil semua data pemasukan
+       $data = Pemasukan::with('user')->latest()->get(); // Ambil semua data
         return view('pemasukan.index', compact('data'));
     }
 
+    /**
+     * 🔹 ADMIN — Form tambah pemasukan
+     */
     public function create()
     {
         return view('pemasukan.create');
     }
 
+    /**
+     * 🔹 ADMIN & USER — Simpan pemasukan baru
+     */
     public function store(Request $request)
     {
-        // Validasi input dari form
         $request->validate([
             'keterangan' => 'required',
             'jumlah' => 'required|numeric',
         ]);
 
-        // Simpan data ke database
         Pemasukan::create([
-            'user_id' => Auth::id(), // ambil ID user yang sedang login
+            'user_id' => Auth::id(),
             'jenis' => 'pemasukan',
             'keterangan' => $request->keterangan,
-            'jumlah' => $request->jumlah
+            'jumlah' => $request->jumlah,
         ]);
 
-        return redirect()->route('pemasukan.index')->with('success', 'Pemasukan berhasil ditambahkan!');
+        // Jika user adalah admin, kembali ke halaman admin
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('pemasukan.index')->with('success', 'Pemasukan berhasil ditambahkan!');
+        }
+
+        // Jika user biasa, kembali ke halaman miliknya
+        return redirect()->route('pemasukan.user')->with('success', 'Pemasukan berhasil ditambahkan!');
     }
 
+    /**
+     * 🔹 ADMIN — Edit data pemasukan
+     */
     public function edit($id)
     {
         $data = Pemasukan::findOrFail($id);
         return view('pemasukan.edit', compact('data'));
     }
 
+    /**
+     * 🔹 ADMIN — Update pemasukan
+     */
     public function update(Request $request, $id)
     {
-        // Validasi input dari form
         $request->validate([
             'keterangan' => 'required',
             'jumlah' => 'required|numeric',
         ]);
 
-        // Update data
         $transaksi = Pemasukan::findOrFail($id);
         $transaksi->update([
             'user_id' => Auth::id(),
@@ -63,9 +80,25 @@ class PemasukanController extends Controller
         return redirect()->route('pemasukan.index')->with('success', 'Pemasukan berhasil diupdate!');
     }
 
+    /**
+     * 🔹 ADMIN — Hapus pemasukan
+     */
     public function destroy($id)
     {
         Pemasukan::findOrFail($id)->delete();
         return redirect()->route('pemasukan.index')->with('success', 'Pemasukan berhasil dihapus!');
+    }
+
+    /**
+     * 🔹 USER — Lihat pemasukan miliknya sendiri
+     */
+    public function userIndex()
+    {
+        // Ambil hanya data milik user yang login
+        $data = Pemasukan::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pemasukan.user', compact('data'));
     }
 }

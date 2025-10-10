@@ -199,16 +199,27 @@
     <div class="sidebar" id="sidebar">
         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"><i
                 class="bi bi-house-door"></i> Dashboard</a>
-        <a href="{{ route('pemasukan.index') }}" class="{{ request()->routeIs('pemasukan.*') ? 'active' : '' }}"><i
-                class="bi bi-wallet2"></i> Pemasukan</a>
-        <a href="{{ route('pengeluaranday.index') }}"
-            class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}"><i
-                class="bi bi-credit-card-2-back"></i> Pengeluaran</a>
-        <a href="{{ route('history') }}" class="{{ request()->routeIs('history') ? 'active' : '' }}"><i
-                class="bi bi-journal-text"></i> History</a>
-        <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
-            <i class="bi bi-people"></i> Kelola User
-        </a>
+
+        @if (Auth::user()->role === 'admin')
+            <a href="{{ route('pemasukan.index') }}" class="{{ request()->routeIs('pemasukan.*') ? 'active' : '' }}"><i
+                    class="bi bi-wallet2"></i> Pemasukan</a>
+            <a href="{{ route('pengeluaranday.index') }}"
+                class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}"><i
+                    class="bi bi-credit-card-2-back"></i> Pengeluaran</a>
+            <a href="{{ route('history') }}" class="{{ request()->routeIs('history') ? 'active' : '' }}"><i
+                    class="bi bi-journal-text"></i> History</a>
+            <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <i class="bi bi-people"></i> Kelola User
+            @else
+                <a href="{{ route('pemasukan.user') }}"
+                    class="{{ request()->routeIs('pemasukan.*') ? 'active' : '' }}"><i class="bi bi-wallet2"></i>
+                    Pemasukan</a>
+                <a href="{{ route('pengeluaranday.user') }}"
+                    class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}"><i
+                        class="bi bi-credit-card-2-back"></i> Pengeluaran</a>
+                <a href="{{ route('history.user') }}" class="{{ request()->routeIs('history.user') ? 'active' : '' }}"><i
+                        class="bi bi-journal-text"></i> History</a>
+        @endif
     </div>
 
     <!-- Content -->

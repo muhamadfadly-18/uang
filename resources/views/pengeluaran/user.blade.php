@@ -24,7 +24,6 @@
                         <tr class="text-center">
                             <th>No</th>
                             <th class="text-start">Keterangan</th>
-                            <th >user</th>
                             <th>Harga per Item</th>
                             <th>Jumlah</th>
                             <th>Total</th>
@@ -37,7 +36,6 @@
                         <tr class="text-center">
                             <td>{{ $i + 1 }}</td>
                             <td class="text-start">{{ $d->keterangan }}</td>
-                            <td class="text-start">{{ $d->user->name ?? '-' }}</td>
                             <td class="text-danger fw-semibold">Rp {{ number_format($d->harga, 0, ',', '.') }}</td>
                             <td>{{ $d->jumlah }}</td>
                             <td class="fw-semibold">Rp {{ number_format($d->total, 0, ',', '.') }}</td>

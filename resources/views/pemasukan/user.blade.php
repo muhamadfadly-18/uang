@@ -17,7 +17,6 @@
                         <tr class="text-center">
                             <th>No</th>
                             <th class="text-start">Keterangan</th>
-                            <th>user</th>
                             <th>Jumlah</th>
                             <th>Tanggal</th>
                             <th>Aksi</th>
@@ -28,7 +27,6 @@
                         <tr class="text-center">
                             <td>{{ $i + 1 }}</td>
                             <td class="text-start">{{ $d->keterangan }}</td>
-                            <td class="text-start">{{ $d->user->name ?? '-' }}</td>
                             <td class="text-success fw-semibold">Rp {{ number_format($d->jumlah, 0, ',', '.') }}</td>
                             <td>{{ $d->created_at->format('d M Y') }}</td>
                             <td class="text-nowrap">

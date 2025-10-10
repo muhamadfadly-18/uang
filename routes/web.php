@@ -59,7 +59,22 @@ Route::middleware('auth')->group(function () {
     // User hanya bisa lihat datanya sendiri
     Route::middleware('role:user')->group(function () {
         Route::get('/pemasukan-saya', [PemasukanController::class, 'userIndex'])->name('pemasukan.user');
-        Route::get('/pengeluaran-saya', [PengeluaranController::class, 'userIndex'])->name('pengeluaran.user');
+         Route::get('/pemasukan/create', [PemasukanController::class, 'create'])->name('pemasukan.create');
+        Route::post('/pemasukan', [PemasukanController::class, 'store'])->name('pemasukan.store');
+        Route::get('/pemasukan/{id}/edit', [PemasukanController::class, 'edit'])->name('pemasukan.edit');
+        Route::post('/pemasukan/{id}', [PemasukanController::class, 'update'])->name('pemasukan.update');
+        Route::delete('/pemasukan/{id}', [PemasukanController::class, 'destroy'])->name('pemasukan.destroy');
+
+
+
+        Route::get('/pengeluaran-saya', [PengeluaranController::class, 'userIndex'])->name('pengeluaranday.user');
+        Route::get('/pengeluaranday/create', [PengeluaranController::class, 'create'])->name('pengeluaranday.create');
+        Route::post('/pengeluaranday', [PengeluaranController::class, 'store'])->name('pengeluaranday.store');
+        Route::get('/pengeluaranday/{id}/edit', [PengeluaranController::class, 'edit'])->name('pengeluaranday.edit');
+        Route::post('/pengeluaranday/{id}', [PengeluaranController::class, 'update'])->name('pengeluaranday.update');
+        Route::delete('/pengeluaranday/{id}', [PengeluaranController::class, 'destroy'])->name('pengeluaranday.destroy');
+
+
         Route::get('/history-saya', [HistoryController::class, 'userHistory'])->name('history.user');
     });
 });

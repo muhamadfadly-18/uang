@@ -5,9 +5,15 @@
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
             <h4 class="mb-0"><i class="bi bi-cash-stack me-2"></i> Tambah Pemasukan</h4>
+            @if(auth()->user()->role === 'admin')
             <a href="{{ route('pemasukan.index') }}" class="btn btn-light btn-sm">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
+            @else
+            <a href="{{ route('pemasukan.user') }}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+            @endif
         </div>
 
         <div class="card-body bg-light">
