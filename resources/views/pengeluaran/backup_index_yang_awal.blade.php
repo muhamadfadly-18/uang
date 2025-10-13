@@ -24,7 +24,7 @@
                         <tr class="text-center">
                             <th>No</th>
                             <th class="text-start">Keterangan</th>
-                            <th>User</th>
+                            <th >user</th>
                             <th>Harga per Item</th>
                             <th>Jumlah</th>
                             <th>Total</th>
@@ -59,7 +59,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
+                            <td colspan="7" class="text-center text-muted py-4">
                                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                 Belum ada data pengeluaran
                             </td>
@@ -77,16 +77,16 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content rounded-4 shadow">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalScanStrukLabel"><i class="bi bi-camera"></i> Scan Struk Otomatis</h5>
+                <h5 class="modal-title" id="modalScanStrukLabel"><i class="bi bi-camera"></i> Scan atau Upload Struk</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body text-center">
-                <p class="text-muted small mb-3">Arahkan kamera ke bagian harga struk, sistem akan membaca otomatis.</p>
+                <p class="text-muted small mb-3">Gunakan kamera atau pilih foto dari galeri.</p>
 
                 <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
                     <button id="btnOpenCamera" class="btn btn-outline-success">
-                        <i class="bi bi-camera-video"></i> Aktifkan Kamera
+                        <i class="bi bi-camera-video"></i> Gunakan Kamera
                     </button>
                     <label for="inputGallery" class="btn btn-outline-primary mb-0">
                         <i class="bi bi-image"></i> Pilih dari Galeri
@@ -100,12 +100,16 @@
                     <div class="scan-frame"></div>
                 </div>
 
+                <!-- Canvas -->
                 <canvas id="cameraCapture" style="display:none;"></canvas>
             </div>
 
             <div class="modal-footer justify-content-between flex-wrap gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle"></i> Tutup
+                </button>
+                <button id="btnCapture" class="btn btn-success d-none">
+                    <i class="bi bi-camera-fill"></i> Ambil Foto
                 </button>
             </div>
         </div>
@@ -117,9 +121,14 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Notifikasi success
     @if(session('success'))
-    Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session('success') }}', showConfirmButton: false, timer: 1500 });
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session('success') }}',
+        showConfirmButton: false,
+        timer: 1500
+    });
     @endif
 
     // Konfirmasi hapus
@@ -135,82 +144,57 @@ document.addEventListener("DOMContentLoaded", function() {
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Ya, hapus!',
                 cancelButtonText: 'Batal'
-            }).then((r) => { if(r.isConfirmed) form.submit(); });
+            }).then((result) => { if(result.isConfirmed) form.submit(); });
         });
     });
 
-    // Kamera
-    let stream, autoScanInterval;
+    // Kamera & Galeri
+    let stream;
     const video = document.getElementById('cameraPreview');
     const canvas = document.getElementById('cameraCapture');
     const cameraContainer = document.getElementById('cameraContainer');
+    const btnCapture = document.getElementById('btnCapture');
     const btnOpenCamera = document.getElementById('btnOpenCamera');
     const inputGallery = document.getElementById('inputGallery');
 
     btnOpenCamera.addEventListener('click', async () => {
         cameraContainer.classList.remove('d-none');
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            video.srcObject = stream;
-            // auto scan tiap 3 detik
-            autoScanInterval = setInterval(captureAndRead, 3000);
-        } catch (err) {
-            Swal.fire('Gagal mengakses kamera', err.message, 'error');
-        }
+        btnCapture.classList.remove('d-none');
+        try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}); video.srcObject = stream; }
+        catch(err){ Swal.fire('Gagal mengakses kamera', err.message,'error'); }
     });
 
     document.getElementById('modalScanStruk').addEventListener('hidden.bs.modal', () => {
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        if (autoScanInterval) clearInterval(autoScanInterval);
+        if(stream) stream.getTracks().forEach(track => track.stop());
         cameraContainer.classList.add('d-none');
+        btnCapture.classList.add('d-none');
     });
 
-    inputGallery.addEventListener('change', e => {
-        if (e.target.files[0]) uploadImage(e.target.files[0]);
-    });
+    inputGallery.addEventListener('change', e => { if(e.target.files[0]) uploadImage(e.target.files[0]); });
 
-    async function captureAndRead() {
+    btnCapture.addEventListener('click', () => {
         const ctx = canvas.getContext('2d');
-        const frame = document.querySelector('.scan-frame');
-        const rect = frame.getBoundingClientRect();
-        const videoRect = video.getBoundingClientRect();
-        const scaleX = video.videoWidth / videoRect.width;
-        const scaleY = video.videoHeight / videoRect.height;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => uploadImage(blob),'image/png');
+    });
 
-        const cropX = (rect.left - videoRect.left) * scaleX;
-        const cropY = (rect.top - videoRect.top) * scaleY;
-        const cropWidth = rect.width * scaleX;
-        const cropHeight = rect.height * scaleY;
-
-        canvas.width = cropWidth;
-        canvas.height = cropHeight;
-        ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-        canvas.toBlob(blob => uploadImage(blob), 'image/png');
-    }
-
-    async function uploadImage(fileBlob) {
+    async function uploadImage(fileBlob){
         const formData = new FormData();
         formData.append('struk', fileBlob, 'scan.png');
         formData.append('_token', '{{ csrf_token() }}');
 
-        try {
-            const response = await fetch('{{ route('pengeluaran.scan') }}', { method: 'POST', body: formData });
-            const result = await response.json();
+        Swal.fire({title:'Memproses struk...',text:'Mohon tunggu sebentar',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
 
-            if (result.success && result.data) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Harga Terdeteksi',
-                    text: `Rp ${result.data.harga}`,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                clearInterval(autoScanInterval);
-            }
-        } catch (err) {
-            console.error(err);
-        }
+        try{
+            const response = await fetch('{{ route('pengeluaran.scan') }}',{method:'POST',body:formData});
+            const result = await response.json();
+            if(result.success){
+                Swal.fire({icon:'success',title:'Berhasil Dibaca!',text:result.message||'Struk berhasil diproses!',timer:1500,showConfirmButton:false})
+                    .then(()=>window.location.reload());
+            }else Swal.fire('Gagal membaca struk',result.message||'Coba ulangi.','error');
+        }catch(err){ Swal.fire('Error','Terjadi kesalahan saat memproses struk.','error'); }
     }
 });
 </script>
@@ -227,6 +211,6 @@ body{background-color:#f8f9fa;}
 #cameraPreview{width:100%;height:100%;object-fit:cover;}
 .scan-frame{position:absolute;top:15%;left:10%;width:80%;height:60%;border:3px solid #00ff00;border-radius:12px;box-shadow:0 0 20px rgba(0,255,0,0.4);animation:pulse 2s infinite;}
 @keyframes pulse{0%{box-shadow:0 0 20px rgba(0,255,0,0.4);}50%{box-shadow:0 0 40px rgba(0,255,0,0.8);}100%{box-shadow:0 0 20px rgba(0,255,0,0.4);}}
-@media(max-width:768px){.table-responsive{overflow-x:auto;}.text-nowrap{white-space:nowrap;}}
+@media(max-width:768px){.table-responsive{overflow-x:auto;}.text-nowrap{white-space:nowrap;}.d-flex.flex-column.flex-md-row{flex-direction:column!important;}.flex-wrap{flex-wrap:wrap!important;}}
 </style>
 @endsection

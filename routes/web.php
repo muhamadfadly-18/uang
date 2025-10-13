@@ -105,6 +105,13 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// Menampilkan halaman scan
+Route::get('/test-scan', function () {
+    return view('pengeluaran.scan'); // nama blade file: resources/views/scan.blade.php
+})->name('test.scan');
+
+
+
 // Debug route untuk cek role
 Route::get('/cek-role', function () {
     if (Auth::check()) {

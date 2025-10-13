@@ -172,6 +172,8 @@ class PengeluaranController extends Controller
      */
     public function scan(Request $request)
     {
+
+        // dd($request->all());
         try {
             $request->validate([
                 'struk' => 'required|image|mimes:jpeg,png,jpg|max:4096',
@@ -210,6 +212,8 @@ class PengeluaranController extends Controller
 
                 $nama = implode(' ', $parts);
                 $total = $harga_satuan * $jumlah;
+                dd($nama, $harga_satuan, $jumlah, $total);
+                
 
                 if (!empty($nama) && $harga_satuan > 0 && $jumlah > 0) {
                     $items[] = [
