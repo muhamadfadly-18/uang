@@ -13,7 +13,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 
     <link rel="shortcut icon" href="{{ asset('img/icon-512.png') }}" type="image/png">
-
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <meta name="theme-color" content="#007bff">
 
@@ -197,29 +196,46 @@
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"><i
-                class="bi bi-house-door"></i> Dashboard</a>
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <i class="bi bi-house-door"></i> Dashboard
+        </a>
 
         @if (Auth::user()->role === 'admin')
-            <a href="{{ route('pemasukan.index') }}" class="{{ request()->routeIs('pemasukan.*') ? 'active' : '' }}"><i
-                    class="bi bi-wallet2"></i> Pemasukan</a>
-            <a href="{{ route('pengeluaranday.index') }}"
-                class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}"><i
-                    class="bi bi-credit-card-2-back"></i> Pengeluaran</a>
-            <a href="{{ route('history') }}" class="{{ request()->routeIs('history') ? 'active' : '' }}"><i
-                    class="bi bi-journal-text"></i> History</a>
+            <a href="{{ route('pemasukan.index') }}" class="{{ request()->routeIs('pemasukan.*') ? 'active' : '' }}">
+                <i class="bi bi-wallet2"></i> Pemasukan
+            </a>
+
+            <a href="{{ route('pengeluaranday.index') }}" class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}">
+                <i class="bi bi-credit-card-2-back"></i> Pengeluaran
+            </a>
+
+            <a href="{{ route('target.index') }}" class="{{ request()->routeIs('target.*') ? 'active' : '' }}">
+                <i class="bi bi-bullseye"></i> Target
+            </a>
+
+            <a href="{{ route('history') }}" class="{{ request()->routeIs('history') ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i> History
+            </a>
+
             <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
-                <i class="bi bi-people"></i> Kelola User</a>
-            @else
-                <a href="{{ route('pemasukan.user') }}"
-                    class="{{ request()->routeIs('pemasukan.*') ? 'active' : '' }}"><i class="bi bi-wallet2"></i>
-                    Pemasukan</a>
-                <a href="{{ route('pengeluaranday.user') }}"
-                    class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}"><i
-                        class="bi bi-credit-card-2-back"></i> Pengeluaran</a>
-                <a href="{{ route('history.user') }}"
-                    class="{{ request()->routeIs('history.user') ? 'active' : '' }}"><i class="bi bi-journal-text"></i>
-                    History</a>
+                <i class="bi bi-people"></i> Kelola User
+            </a>
+        @else
+            <a href="{{ route('pemasukan.user.index') }}" class="{{ request()->routeIs('pemasukan.user.*') ? 'active' : '' }}">
+                <i class="bi bi-wallet2"></i> Pemasukan
+            </a>
+
+            <a href="{{ route('pengeluaranday.user.index') }}" class="{{ request()->routeIs('pengeluaranday.user.*') ? 'active' : '' }}">
+                <i class="bi bi-credit-card-2-back"></i> Pengeluaran
+            </a>
+
+            <a href="{{ route('target.user.index') }}" class="{{ request()->routeIs('target.user.*') ? 'active' : '' }}">
+                <i class="bi bi-bullseye"></i> Target Saya
+            </a>
+
+            <a href="{{ route('history.user') }}" class="{{ request()->routeIs('history.user') ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i> History
+            </a>
         @endif
     </div>
 

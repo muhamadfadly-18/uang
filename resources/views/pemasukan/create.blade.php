@@ -10,14 +10,18 @@
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
             @else
-            <a href="{{ route('pemasukan.user') }}" class="btn btn-light btn-sm">
+            <a href="{{ route('pemasukan.user.index') }}" class="btn btn-light btn-sm">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
             @endif
         </div>
 
         <div class="card-body bg-light">
+              @if (Auth::user()->role == 'admin')
             <form action="{{ route('pemasukan.store') }}" method="POST" id="formPemasukan">
+            @else
+            <form action="{{ route('pemasukan.user.store') }}" method="POST" id="formPemasukan">
+            @endif
                 @csrf
 
                 {{-- Input Keterangan --}}

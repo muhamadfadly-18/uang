@@ -48,7 +48,7 @@ class PemasukanController extends Controller
         }
 
         // Jika user biasa, kembali ke halaman miliknya
-        return redirect()->route('pemasukan.user')->with('success', 'Pemasukan berhasil ditambahkan!');
+        return redirect()->route('pemasukan.user.index')->with('success', 'Pemasukan berhasil ditambahkan!');
     }
 
     /**

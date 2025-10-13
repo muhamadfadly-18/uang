@@ -5,9 +5,15 @@
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
             <h4 class="mb-0"><i class="bi bi-credit-card-2-back me-2"></i> Tambah Pengeluaran</h4>
+              @if (Auth::user()->role == 'admin')
             <a href="{{ route('pengeluaranday.index') }}" class="btn btn-light btn-sm">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
+            @else
+            <a href="{{ route('pengeluaranday.user.index') }}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+            @endif
         </div>
 
         @php
@@ -25,8 +31,11 @@
                 <strong><i class="bi bi-wallet2"></i> Saldo Anda Saat Ini:</strong>
                 <span class="fw-bold text-success">Rp {{ number_format($saldo, 0, ',', '.') }}</span>
             </div>
-
+  @if (Auth::user()->role == 'admin')
             <form action="{{ route('pengeluaranday.store') }}" method="POST" id="formPengeluaran">
+            @else
+            <form action="{{ route('pengeluaranday.user.store') }}" method="POST" id="formPengeluaran">
+            @endif
                 @csrf
 
                 {{-- Keterangan --}}

@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2">
         <h2 class="fw-bold mb-0"><i class="bi bi-wallet2"></i> Data Pemasukan</h2>
-        <a href="{{ route('pemasukan.create') }}" class="btn btn-primary shadow-sm">
+        <a href="{{ route('pemasukan.user.create') }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle"></i> Tambah Pemasukan
         </a>
     </div>
@@ -30,11 +30,11 @@
                             <td class="text-success fw-semibold">Rp {{ number_format($d->jumlah, 0, ',', '.') }}</td>
                             <td>{{ $d->created_at->format('d M Y') }}</td>
                             <td class="text-nowrap">
-                                <a href="{{ route('pemasukan.edit', $d->id) }}" class="btn btn-warning btn-sm me-1 mb-1 mb-md-0">
+                                <a href="{{ route('pemasukan.user.edit', $d->id) }}" class="btn btn-warning btn-sm me-1 mb-1 mb-md-0">
                                     <i class="bi bi-pencil-square"></i> Edit
                                 </a>
 
-                                <form action="{{ route('pemasukan.destroy', $d->id) }}" method="POST" class="d-inline formHapus">
+                                <form action="{{ route('pemasukan.user.destroy', $d->id) }}" method="POST" class="d-inline formHapus">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-danger btn-sm btnHapus">

@@ -5,13 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Pemasukan;
+use App\Models\Pengeluaran;
 
 class ProfileController extends Controller
 {
     public function edit()
     {
         $user = Auth::user();
-        return view('profile.edit', compact('user'));
+
+        // Hitung saldo user
+        $totalPemasukan = Pemasukan::where('user_id', $user->id)->sum('jumlah');
+        $totalPengeluaran = Pengeluaran::where('user_id', $user->id)->sum('jumlah');
+        $saldo = $totalPemasukan - $totalPengeluaran;
+
+        return view('profile.edit', compact('user', 'saldo'));
     }
 
     public function update(Request $request)

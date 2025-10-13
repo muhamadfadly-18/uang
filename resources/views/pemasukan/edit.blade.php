@@ -11,7 +11,11 @@
         </div>
 
         <div class="card-body bg-light">
-            <form action="{{ route('pemasukan.update', $data->id) }}" method="POST" id="formEditPemasukan">
+            @if (Auth::user()->role == 'admin')
+              <form action="{{ route('pemasukan.update', $data->id) }}" method="POST" id="formEditPemasukan"></form>
+            @else
+            <form action="{{ route('pemasukan.user.update', $data->id) }}" method="POST" id="formEditPemasukan">
+            @endif
                 @csrf
                 @method('PUT')
 

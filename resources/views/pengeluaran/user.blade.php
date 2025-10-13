@@ -5,7 +5,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2">
         <h2 class="fw-bold mb-0"><i class="bi bi-cash-stack"></i> Data Pengeluaran</h2>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('pengeluaranday.create') }}" class="btn btn-primary shadow-sm">
+            <a href="{{ route('pengeluaranday.user.create') }}" class="btn btn-primary shadow-sm">
                 <i class="bi bi-plus-circle"></i> Tambah Pengeluaran
             </a>
 
@@ -42,10 +42,10 @@
                             <td>{{ $d->created_at->format('d M Y') }}</td>
                             <td class="text-nowrap">
                                 <div class="d-flex flex-wrap justify-content-center gap-1">
-                                    <a href="{{ route('pengeluaranday.edit', $d->id) }}" class="btn btn-warning btn-sm">
+                                    <a href="{{ route('pengeluaranday.user.edit', $d->id) }}" class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </a>
-                                    <form action="{{ route('pengeluaranday.destroy', $d->id) }}" method="POST" class="d-inline formHapus">
+                                    <form action="{{ route('pengeluaranday.user.destroy', $d->id) }}" method="POST" class="d-inline formHapus">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" class="btn btn-danger btn-sm btnHapus">
