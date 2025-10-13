@@ -109,6 +109,7 @@
                             mb-2 px-2 py-2" style="font-size: 15px">
                             {{ ucfirst($t->status) }}
                         </span>
+                        by {{ $t->user->name ?? 'Unknown' }}
                     </h5>
 
                     <div class="progress mb-3">

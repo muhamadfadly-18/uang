@@ -11,9 +11,10 @@ class TargetController extends Controller
 {
     public function index()
     {
-        $targets = Target::with('histories')->get();
+        $targets = Target::with(['histories', 'user'])->get();
         return view('target.index', compact('targets'));
     }
+
 
     public function userIndex()
     {
