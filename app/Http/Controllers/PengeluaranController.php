@@ -212,7 +212,7 @@ class PengeluaranController extends Controller
 
                 $nama = implode(' ', $parts);
                 $total = $harga_satuan * $jumlah;
-                dd($nama, $harga_satuan, $jumlah, $total);
+                // dd($nama, $harga_satuan, $jumlah, $total);
                 
 
                 if (!empty($nama) && $harga_satuan > 0 && $jumlah > 0) {
