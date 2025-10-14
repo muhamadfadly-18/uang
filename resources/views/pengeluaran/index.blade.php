@@ -24,7 +24,7 @@
                         <tr class="text-center">
                             <th>No</th>
                             <th class="text-start">Keterangan</th>
-                            <th>User</th>
+                            <th>user</th>
                             <th>Harga per Item</th>
                             <th>Jumlah</th>
                             <th>Total</th>
@@ -34,36 +34,36 @@
                     </thead>
                     <tbody>
                         @forelse($data as $i => $d)
-                        <tr class="text-center">
-                            <td>{{ $i + 1 }}</td>
-                            <td class="text-start">{{ $d->keterangan }}</td>
-                            <td class="text-start">{{ $d->user->name ?? '-' }}</td>
-                            <td class="text-danger fw-semibold">Rp {{ number_format($d->harga, 0, ',', '.') }}</td>
-                            <td>{{ $d->jumlah }}</td>
-                            <td class="fw-semibold">Rp {{ number_format($d->total, 0, ',', '.') }}</td>
-                            <td>{{ $d->created_at->format('d M Y') }}</td>
-                            <td class="text-nowrap">
-                                <div class="d-flex flex-wrap justify-content-center gap-1">
-                                    <a href="{{ route('pengeluaranday.edit', $d->id) }}" class="btn btn-warning btn-sm">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-                                    <form action="{{ route('pengeluaranday.destroy', $d->id) }}" method="POST" class="d-inline formHapus">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="btn btn-danger btn-sm btnHapus">
-                                            <i class="bi bi-trash3"></i> Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                            <tr class="text-center">
+                                <td>{{ $i + 1 }}</td>
+                                <td class="text-start">{{ $d->keterangan }}</td>
+                                <td class="text-start">{{ $d->user->name ?? '-' }}</td>
+                                <td class="text-danger fw-semibold">Rp {{ number_format($d->harga, 0, ',', '.') }}</td>
+                                <td>{{ $d->jumlah }}</td>
+                                <td class="fw-semibold">Rp {{ number_format($d->total, 0, ',', '.') }}</td>
+                                <td>{{ $d->created_at->format('d M Y') }}</td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex flex-wrap justify-content-center gap-1">
+                                        <a href="{{ route('pengeluaranday.edit', $d->id) }}" class="btn btn-warning btn-sm">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <form action="{{ route('pengeluaranday.destroy', $d->id) }}" method="POST" class="d-inline formHapus">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-danger btn-sm btnHapus">
+                                                <i class="bi bi-trash3"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                Belum ada data pengeluaran
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                    Belum ada data pengeluaran
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -77,16 +77,16 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content rounded-4 shadow">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalScanStrukLabel"><i class="bi bi-camera"></i> Scan Struk Otomatis</h5>
+                <h5 class="modal-title" id="modalScanStrukLabel"><i class="bi bi-camera"></i> Scan atau Upload Struk</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body text-center">
-                <p class="text-muted small mb-3">Arahkan kamera ke bagian harga struk, sistem akan membaca otomatis.</p>
+                <p class="text-muted small mb-3">Arahkan kamera ke struk, sistem akan membaca otomatis.</p>
 
                 <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
                     <button id="btnOpenCamera" class="btn btn-outline-success">
-                        <i class="bi bi-camera-video"></i> Aktifkan Kamera
+                        <i class="bi bi-camera-video"></i> Gunakan Kamera
                     </button>
                     <label for="inputGallery" class="btn btn-outline-primary mb-0">
                         <i class="bi bi-image"></i> Pilih dari Galeri
@@ -98,8 +98,13 @@
                 <div id="cameraContainer" class="camera-wrapper position-relative d-none mx-auto">
                     <video id="cameraPreview" autoplay playsinline class="rounded-4 border border-success w-100"></video>
                     <div class="scan-frame"></div>
+                    <div id="loadingScan" class="loading-overlay d-none">
+                        <div class="spinner-border text-light" role="status"></div>
+                        <p class="text-light mt-2">Membaca struk...</p>
+                    </div>
                 </div>
 
+                <!-- Canvas -->
                 <canvas id="cameraCapture" style="display:none;"></canvas>
             </div>
 
@@ -116,117 +121,198 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Notifikasi success
-    @if(session('success'))
-    Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session('success') }}', showConfirmButton: false, timer: 1500 });
-    @endif
-
-    // Konfirmasi hapus
-    document.querySelectorAll('.btnHapus').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const form = this.closest('.formHapus');
+    document.addEventListener("DOMContentLoaded", function() {
+        @if (session('success'))
             Swal.fire({
-                title: 'Yakin ingin menghapus?',
-                text: "Data yang dihapus tidak dapat dikembalikan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((r) => { if(r.isConfirmed) form.submit(); });
-        });
-    });
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        @endif
 
-    // Kamera
-    let stream, autoScanInterval;
-    const video = document.getElementById('cameraPreview');
-    const canvas = document.getElementById('cameraCapture');
-    const cameraContainer = document.getElementById('cameraContainer');
-    const btnOpenCamera = document.getElementById('btnOpenCamera');
-    const inputGallery = document.getElementById('inputGallery');
-
-    btnOpenCamera.addEventListener('click', async () => {
-        cameraContainer.classList.remove('d-none');
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            video.srcObject = stream;
-            // auto scan tiap 3 detik
-            autoScanInterval = setInterval(captureAndRead, 3000);
-        } catch (err) {
-            Swal.fire('Gagal mengakses kamera', err.message, 'error');
-        }
-    });
-
-    document.getElementById('modalScanStruk').addEventListener('hidden.bs.modal', () => {
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        if (autoScanInterval) clearInterval(autoScanInterval);
-        cameraContainer.classList.add('d-none');
-    });
-
-    inputGallery.addEventListener('change', e => {
-        if (e.target.files[0]) uploadImage(e.target.files[0]);
-    });
-
-    async function captureAndRead() {
-        const ctx = canvas.getContext('2d');
-        const frame = document.querySelector('.scan-frame');
-        const rect = frame.getBoundingClientRect();
-        const videoRect = video.getBoundingClientRect();
-        const scaleX = video.videoWidth / videoRect.width;
-        const scaleY = video.videoHeight / videoRect.height;
-
-        const cropX = (rect.left - videoRect.left) * scaleX;
-        const cropY = (rect.top - videoRect.top) * scaleY;
-        const cropWidth = rect.width * scaleX;
-        const cropHeight = rect.height * scaleY;
-
-        canvas.width = cropWidth;
-        canvas.height = cropHeight;
-        ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-        canvas.toBlob(blob => uploadImage(blob), 'image/png');
-    }
-
-    async function uploadImage(fileBlob) {
-        const formData = new FormData();
-        formData.append('struk', fileBlob, 'scan.png');
-        formData.append('_token', '{{ csrf_token() }}');
-
-        try {
-            const response = await fetch('{{ route('pengeluaran.scan') }}', { method: 'POST', body: formData });
-            const result = await response.json();
-
-            if (result.success && result.data) {
+        // Hapus Data
+        document.querySelectorAll('.btnHapus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const form = this.closest('.formHapus');
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Harga Terdeteksi',
-                    text: `Rp ${result.data.harga}`,
-                    showConfirmButton: false,
-                    timer: 1500
+                    title: 'Yakin ingin menghapus?',
+                    text: "Data yang dihapus tidak dapat dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
                 });
-                clearInterval(autoScanInterval);
+            });
+        });
+
+        // === Kamera Otomatis Scan ===
+        let stream, scanning = false;
+        const video = document.getElementById('cameraPreview');
+        const canvas = document.getElementById('cameraCapture');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const btnOpenCamera = document.getElementById('btnOpenCamera');
+        const inputGallery = document.getElementById('inputGallery');
+        const loadingOverlay = document.getElementById('loadingScan');
+
+        btnOpenCamera.addEventListener('click', async () => {
+            cameraContainer.classList.remove('d-none');
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+
+                video.onplaying = () => {
+                    if (!scanning) {
+                        scanning = true;
+                        autoScan();
+                    }
+                };
+            } catch (err) {
+                Swal.fire('Gagal mengakses kamera', err.message, 'error');
             }
-        } catch (err) {
-            console.error(err);
+        });
+
+        document.getElementById('modalScanStruk').addEventListener('hidden.bs.modal', () => {
+            if (stream) stream.getTracks().forEach(track => track.stop());
+            cameraContainer.classList.add('d-none');
+            scanning = false;
+        });
+
+        async function autoScan() {
+            if (!scanning) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(async (blob) => {
+                loadingOverlay.classList.remove('d-none');
+                const formData = new FormData();
+                formData.append('struk', blob, 'scan.png');
+                formData.append('_token', '{{ csrf_token() }}');
+
+                try {
+                    const response = await fetch('{{ route('pengeluaran.scan') }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        scanning = false;
+                        if (stream) stream.getTracks().forEach(track => track.stop());
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Struk Terbaca!',
+                            text: result.message || 'Struk berhasil diproses!',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = result.redirect || "{{ route('pengeluaranday.index') }}";
+                        });
+                    }
+                } catch (err) {
+                    console.error('Scan error:', err);
+                } finally {
+                    loadingOverlay.classList.add('d-none');
+                }
+
+                if (scanning) setTimeout(autoScan, 2000);
+            }, 'image/png');
         }
-    }
-});
+
+        // Upload dari galeri
+        inputGallery.addEventListener('change', e => {
+            if (e.target.files[0]) uploadImage(e.target.files[0]);
+        });
+
+        async function uploadImage(fileBlob) {
+            const formData = new FormData();
+            formData.append('struk', fileBlob, 'scan.png');
+            formData.append('_token', '{{ csrf_token() }}');
+
+            Swal.fire({
+                title: 'Memproses struk...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const response = await fetch('{{ route('pengeluaran.scan') }}', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil Dibaca!',
+                        text: result.message || 'Struk berhasil diproses!',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = result.redirect || "{{ route('pengeluaranday.index') }}";
+                    });
+                } else {
+                    Swal.fire('Gagal membaca struk', result.message || 'Coba ulangi.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Terjadi kesalahan saat memproses struk.', 'error');
+            }
+        }
+    });
 </script>
 
 <style>
-body{background-color:#f8f9fa;}
-.card{border-radius:15px;}
-.table{border-radius:10px;overflow:hidden;min-width:600px;}
-.table th{font-weight:600;}
-.table td{vertical-align:middle;}
-.btn{border-radius:10px;}
-.modal-content{border-radius:15px;}
-.camera-wrapper{position:relative;width:100%;max-width:500px;aspect-ratio:3/4;overflow:hidden;margin:auto;}
-#cameraPreview{width:100%;height:100%;object-fit:cover;}
-.scan-frame{position:absolute;top:15%;left:10%;width:80%;height:60%;border:3px solid #00ff00;border-radius:12px;box-shadow:0 0 20px rgba(0,255,0,0.4);animation:pulse 2s infinite;}
-@keyframes pulse{0%{box-shadow:0 0 20px rgba(0,255,0,0.4);}50%{box-shadow:0 0 40px rgba(0,255,0,0.8);}100%{box-shadow:0 0 20px rgba(0,255,0,0.4);}}
-@media(max-width:768px){.table-responsive{overflow-x:auto;}.text-nowrap{white-space:nowrap;}}
+    body { background-color: #f8f9fa; }
+    .card { border-radius: 15px; }
+    .table { border-radius: 10px; overflow: hidden; min-width: 600px; }
+    .table th { font-weight: 600; }
+    .btn { border-radius: 10px; }
+    .modal-content { border-radius: 15px; }
+
+    .camera-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        margin: auto;
+    }
+
+    #cameraPreview { width: 100%; height: 100%; object-fit: cover; }
+
+    .scan-frame {
+        position: absolute;
+        top: 15%;
+        left: 10%;
+        width: 80%;
+        height: 60%;
+        border: 3px solid #00ff00;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); }
+        50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
+        100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); }
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+    }
 </style>
 @endsection

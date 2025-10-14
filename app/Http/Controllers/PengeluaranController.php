@@ -20,7 +20,7 @@ class PengeluaranController extends Controller
      */
     public function index()
     {
-        $data = Pengeluaran::with('user')->latest()->get();
+        $data = Pengeluaran::with('user')->latest()->paginate(10);
         return view('pengeluaran.index', compact('data'));
     }
 
@@ -172,8 +172,6 @@ class PengeluaranController extends Controller
      */
     public function scan(Request $request)
     {
-
-        // dd($request->all());
         try {
             $request->validate([
                 'struk' => 'required|image|mimes:jpeg,png,jpg|max:4096',
@@ -198,11 +196,14 @@ class PengeluaranController extends Controller
 
             foreach ($lines as $line) {
                 $line = trim($line);
-                if (empty($line)) continue;
-                if (preg_match('/telp|total|qty/i', $line)) continue;
+                if (empty($line))
+                    continue;
+                if (preg_match('/telp|total|qty/i', $line))
+                    continue;
 
                 $parts = preg_split('/\s+/', $line);
-                if (count($parts) < 3) continue;
+                if (count($parts) < 3)
+                    continue;
 
                 $harga_satuan_str = array_pop($parts);
                 $harga_satuan = floatval(str_replace([',', '.'], '', $harga_satuan_str));
@@ -212,8 +213,6 @@ class PengeluaranController extends Controller
 
                 $nama = implode(' ', $parts);
                 $total = $harga_satuan * $jumlah;
-                // dd($nama, $harga_satuan, $jumlah, $total);
-                
 
                 if (!empty($nama) && $harga_satuan > 0 && $jumlah > 0) {
                     $items[] = [
@@ -226,7 +225,10 @@ class PengeluaranController extends Controller
             }
 
             if (count($items) == 0) {
-                return redirect()->back()->with('error', 'Tidak ada produk valid ditemukan.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada produk valid ditemukan.'
+                ], 200);
             }
 
             foreach ($items as $item) {
@@ -239,11 +241,27 @@ class PengeluaranController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', count($items) . ' produk berhasil disimpan.');
+            if (Auth::user()->role === 'admin') {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('pengeluaranday.index'),
+                    'message' => count($items) . ' produk berhasil disimpan.'
+                ], 200);
+            }
+
+            return response()->json([
+                'success' => true,
+                'redirect' => route('pengeluaranday.user'),
+                'message' => count($items) . ' produk berhasil disimpan.'
+            ], 200);
 
         } catch (\Throwable $e) {
-            \Log::error('Scan Struk Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
         }
     }
+
+
 }

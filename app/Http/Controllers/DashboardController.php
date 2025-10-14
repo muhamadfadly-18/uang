@@ -35,7 +35,7 @@ class DashboardController extends Controller
         }
 
         $totalPemasukan = $pemasukanQuery->sum('jumlah');
-        $totalPengeluaran = $pengeluaranQuery->sum('jumlah');
+        $totalPengeluaran = $pengeluaranQuery->sum('total');
         $saldo = $totalPemasukan - $totalPengeluaran;
 
         $days = collect(range(1, 31))->map(function($day) use ($filterBulan, $filterTahun) {
