@@ -166,18 +166,37 @@
                 <ul class="navbar-nav">
                     <!-- Profile Dropdown -->
                     <li class="nav-item dropdown">
+                        @php
+                            use Illuminate\Support\Str;
+
+                            $user = Auth::user();
+                            $photo = $user->photo ?? null;
+
+                            if ($photo) {
+                                if (Str::startsWith($photo, 'data:image')) {
+                                    // Base64
+                                    $photoPath = $photo;
+                                } elseif (Str::startsWith($photo, 'http')) {
+                                    // URL (misal Cloudinary)
+                                    $photoPath = $photo;
+                                } else {
+                                    // File lokal (public/img/profile)
+                                    $photoPath = asset('img/profile/' . $photo);
+                                }
+                            } else {
+                                // Default avatar
+                                $photoPath = asset('img/profile/default.png');
+                            }
+                        @endphp
+
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            @php
-                                $photoPath = Auth::user()->photo
-                                    ? asset('img/profile/' . Auth::user()->photo)
-                                    : asset('img/profile/default.png');
-                            @endphp
                             <img src="{{ $photoPath }}" alt="Profile"
                                 class="rounded-circle me-2 border border-2 border-white shadow-sm" width="35"
                                 height="35" style="object-fit: cover;">
-                            <span>{{ Auth::user()->name ?? 'Admin' }}</span>
+                            <span>{{ $user->name ?? 'Admin' }}</span>
                         </a>
+
 
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
@@ -205,7 +224,8 @@
                 <i class="bi bi-wallet2"></i> Pemasukan
             </a>
 
-            <a href="{{ route('pengeluaranday.index') }}" class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}">
+            <a href="{{ route('pengeluaranday.index') }}"
+                class="{{ request()->routeIs('pengeluaranday.*') ? 'active' : '' }}">
                 <i class="bi bi-credit-card-2-back"></i> Pengeluaran
             </a>
 
@@ -221,15 +241,18 @@
                 <i class="bi bi-people"></i> Kelola User
             </a>
         @else
-            <a href="{{ route('pemasukan.user.index') }}" class="{{ request()->routeIs('pemasukan.user.*') ? 'active' : '' }}">
+            <a href="{{ route('pemasukan.user.index') }}"
+                class="{{ request()->routeIs('pemasukan.user.*') ? 'active' : '' }}">
                 <i class="bi bi-wallet2"></i> Pemasukan
             </a>
 
-            <a href="{{ route('pengeluaranday.user.index') }}" class="{{ request()->routeIs('pengeluaranday.user.*') ? 'active' : '' }}">
+            <a href="{{ route('pengeluaranday.user.index') }}"
+                class="{{ request()->routeIs('pengeluaranday.user.*') ? 'active' : '' }}">
                 <i class="bi bi-credit-card-2-back"></i> Pengeluaran
             </a>
 
-            <a href="{{ route('target.user.index') }}" class="{{ request()->routeIs('target.user.*') ? 'active' : '' }}">
+            <a href="{{ route('target.user.index') }}"
+                class="{{ request()->routeIs('target.user.*') ? 'active' : '' }}">
                 <i class="bi bi-bullseye"></i> Target Saya
             </a>
 
