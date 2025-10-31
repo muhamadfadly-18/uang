@@ -55,7 +55,7 @@ class HistoryController extends Controller
 
         // Ambil semua pengeluaran user
         $pengeluaran = Pengeluaran::where('user_id', $userId)
-            ->selectRaw("'Pengeluaran' as jenis, keterangan, jumlah, created_at");
+            ->selectRaw("'Pengeluaran' as jenis, keterangan, total, created_at");
 
         // Gabungkan dan urutkan berdasarkan tanggal terbaru
         $data = $pemasukan->unionAll($pengeluaran)

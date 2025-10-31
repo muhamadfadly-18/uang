@@ -1,0 +1,10 @@
+{
+  "appId": "com.laravel.app",
+  "appName": "LaravelApp",
+  "webDir": "public",
+  "server": {
+    "url": "https://uang-eight.vercel.app",
+    "cleartext": true
+  }
+}
+  
